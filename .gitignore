@@ -3,7 +3,6 @@
 
 ### Code ###
 # Visual Studio Code - https://code.visualstudio.com/
-.settings/
 .vscode/
 tsconfig.json
 jsconfig.json
@@ -179,8 +178,6 @@ $RECYCLE.BIN/
 
 # End of https://www.gitignore.io/api/vim,osx,node,code,linux,windows,sublimetext
 
-settings/settings.json
-settings/*.json
 
 !settings/settings.default.json
 !.gitkeep
