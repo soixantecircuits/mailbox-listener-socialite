@@ -1,8 +1,17 @@
 {
-  "name": "sendboxlistener",
+  "name": "mail-listening",
   "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "scripts": {
+    "start": "node app.js"
+  },
   "dependencies": {
+    "@google-cloud/storage": "^1.2.1",
+    "firebase-admin": "^5.2.1",
     "mail-listener-fixed": "^1.1.0",
-    "standard-settings": "^1.1.9"
+    "mail-listener2": "^0.3.1",
+    "standard-settings": "^1.1.9",
+    "request": "^2.83.0"
   }
 }
