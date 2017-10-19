@@ -1,8 +1,8 @@
 {
     "service":{
         "mail":{
-            "username": "eventsocialite@gmail.com",
-            "password": "pareidoliesE",
+            "username": "youtmail@gmail.com",
+            "password": "",
             "host": "imap.gmail.com",
             "port": 993, 
             "tls": true,
@@ -19,7 +19,7 @@
         },
         "firebase":{
             "key":{
-                "path":"/home/sms-feed-firebase-adminsdk-tne6k-d93cea6e36.json"
+                "path":"/home/.json"
             },
             "database":{
                 "name": "feed"
@@ -30,15 +30,15 @@
         },
         "buckets":{
             "default":{
-                "name":"event-42",
-                "token":"TOKEN"
+                "name":"name of your default event",
+                "token":"token of your default event"
             },
-            "event-bucket":{
-                "token":"YOLO42"
+            "one of your active event":{
+                "token":"token of the event"
             }
         },
         "socialiteAPI":{
-            "URL": "http://wp-socialite.dev/wp-json/form/v1/postForm"
+            "URL": "socilalite URL api"
         }
     }
 }
