@@ -50,8 +50,10 @@ let uploadFile = (mail, file, from, subject, html) => {
   var eventbuckettoken = settings.service.buckets.default.token
 
   if (mail.headers['x-event']) {
-    eventbucket = mail.headers['x-event']
-    eventbuckettoken = settings.service.buckets[eventbucket].token
+    if (settings.service.buckets[mail.headers['x-event']].token) {
+      eventbucket = mail.headers['x-event']
+      eventbuckettoken = settings.service.buckets[eventbucket].token
+    }
   }
 
   if (mail.headers['x-from']) {
