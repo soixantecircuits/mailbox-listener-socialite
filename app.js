@@ -10,6 +10,11 @@ const fs = require('fs')
 
 var serviceAccount = require(settings.service.firebase.key.path)
 
+let HeaderX = {
+  'eventKey': 'X-Event',
+  'from': 'X-From'
+}
+
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
   databaseURL: `https://${settings.service.firebase.database.name}.firebaseio.com`,
@@ -32,6 +37,7 @@ mailListener.on('error', (err) => {
 })
 
 mailListener.on('mail', (mail, seqno, attributes) => {
+  console.log(mail.headers)
   if (mail.attachments) {
     uploadFile(mail, mail.attachments[0], mail.from, mail.subject, mail.html)
   }
@@ -49,13 +55,13 @@ let uploadFile = (mail, file, from, subject, html) => {
   var eventbucket = settings.service.buckets.default.name
   var eventbuckettoken = settings.service.buckets.default.token
 
-  if (mail.headers['x-event']) {
-    eventbucket = mail.headers['x-event']
+  if (mail.headers[HeaderX.eventKey]) {
+    eventbucket = mail.headers[HeaderX.eventKey]
     eventbuckettoken = settings.service.buckets[eventbucket].token
   }
 
-  if (mail.headers['x-from']) {
-    fromMail = mail.headers['x-from']
+  if (mail.headers[HeaderX.from]) {
+    fromMail = mail.headers[HeaderX.from]
   }
   var formData = {
     name: file.fileName,
