@@ -7,12 +7,14 @@ var mailListener = new MailListener(settings.service.mail)
 var admin = require('firebase-admin')
 const request = require('request')
 const fs = require('fs')
+const S = require('string')
+const gm = require('gm').subClass({imageMagick: true})
 
 var serviceAccount = require(settings.service.firebase.key.path)
 
 let HeaderX = {
-  'eventKey': 'X-Event',
-  'from': 'X-From'
+  'eventKey': 'x-event',
+  'from': 'x-from'
 }
 
 admin.initializeApp({
@@ -51,33 +53,41 @@ mailListener.on('attachment', function (attachment) {
 })
 
 let uploadFile = (mail, file, from, subject, html) => {
-  var fromMail = from[0].address
-  var eventbucket = settings.service.buckets.default.name
-  var eventbuckettoken = settings.service.buckets.default.token
-
-  if (mail.headers[HeaderX.eventKey]) {
-    if (settings.service.buckets[mail.headers[HeaderX.eventKey]].token) {
-      eventbucket = mail.headers[HeaderX.eventKey]
-      eventbuckettoken = settings.service.buckets[eventbucket].token
+  // auto-orient an image
+  gm(file.path)
+  .autoOrient()
+  .write(file.path, function (err) {
+    var fromMail = from[0].address
+    var eventbucket = settings.service.buckets.default.name
+    var eventbuckettoken = settings.service.buckets.default.token
+    if (S(mail.headers[HeaderX.eventKey]).slugify().s) {
+      if (settings.service.buckets[S(mail.headers[HeaderX.eventKey]).slugify().s]) {
+        eventbucket = S(mail.headers[HeaderX.eventKey]).slugify().s
+        eventbuckettoken = settings.service.buckets[eventbucket].token
+      }
     }
-  }
 
-  if (mail.headers[HeaderX.from]) {
-    fromMail = mail.headers[HeaderX.from]
-  }
-  var formData = {
-    name: file.fileName,
-    file: fs.createReadStream(file.path),
-    token: eventbuckettoken,
-    bucket: eventbucket,
-    mailto: fromMail
-  }
+    if (mail.headers[HeaderX.from]) {
+      fromMail = mail.headers[HeaderX.from]
+    }
+    var formData = {
+      name: file.fileName,
+      file: fs.createReadStream(file.path),
+      token: eventbuckettoken,
+      bucket: eventbucket,
+      mailto: fromMail
+    }
 
-  request.post({url: settings.service.socialiteAPI.URL, formData: formData}, function optionalCallback (err, httpResponse, body) {
+    request.post({url: settings.service.socialiteAPI.URL, formData: formData}, function optionalCallback (err, httpResponse, body) {
+      if (err) {
+        return console.error('upload failed:', err)
+      } else {
+        console.log('Upload successful!  Server responded with:', body)
+      }
+    })
     if (err) {
-      return console.error('upload failed:', err)
-    } else {
-      console.log('Upload successful!  Server responded with:', body)
+      console.error(err)
     }
   })
+
 }
