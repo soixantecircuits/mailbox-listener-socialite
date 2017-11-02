@@ -89,5 +89,4 @@ let uploadFile = (mail, file, from, subject, html) => {
       console.error(err)
     }
   })
-
 }

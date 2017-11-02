@@ -1,8 +1,8 @@
 {
     "service":{
         "mail":{
-            "username": "youtmail@gmail.com",
-            "password": "",
+            "username": "yourmail@gmail.com",
+            "password": "password",
             "host": "imap.gmail.com",
             "port": 993, 
             "tls": true,
@@ -34,7 +34,7 @@
                 "token":"token of your default event"
             },
             "one of your active event":{
-                "token":"token of the event"
+                "token":"TOKEN"
             }
         },
         "socialiteAPI":{
