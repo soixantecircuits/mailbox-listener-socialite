@@ -40,7 +40,7 @@ mailListener.on('error', (err) => {
 
 mailListener.on('mail', (mail, seqno, attributes) => {
   console.log(mail.headers)
-  if (mail.attachments && settings.service.senderOptions[mail.from[0].address]) {
+  if (mail.attachments && mail.attachments.length > 0 && settings.service.senderOptions[mail.from[0].address]) {
     uploadFile(mail, mail.attachments[0], mail.from, mail.subject, mail.html, settings.service.senderOptions[mail.from[0].address]['show-on-gallery'], settings.service.senderOptions[mail.from[0].address]['show-on-wall'])
   } else {
     uploadFile(mail, mail.attachments[0], mail.from, mail.subject, mail.html, true, false)
@@ -68,16 +68,24 @@ let uploadFile = (mail, file, from, subject, html, showOnGallery, showOnWall) =>
         eventbuckettoken = settings.service.buckets[eventbucket].token
       }
     }
-
+    const regexpMail = /[^@<\s]+@[^@\s>]+/g
     if (mail.headers[HeaderX.from]) {
       fromMail = mail.headers[HeaderX.from]
+      if (Array.isArray(fromMail)) {
+        for(var i = 0; i<fromMail.length; i++) {
+          fromMail[i] = fromMail[i].match(regexpMail)
+        }
+      } else {
+        fromMail = fromMail.match(regexpMail)
+      }
     }
+
     var formData = {
       name: file.fileName,
       file: fs.createReadStream(file.path),
       token: eventbuckettoken,
       bucket: eventbucket,
-      mailto: fromMail,
+      mailto: fromMail[0][0],
       showOnGallery: showOnGallery ? 'yes' : 'no',
       showOnWall: showOnWall ? 'yes' : 'no'
     }
