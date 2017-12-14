@@ -14,7 +14,7 @@ var serviceAccount = require(settings.service.firebase.key.path)
 
 let HeaderX = {
   'eventKey': 'x-event',
-  'from': 'x-from'
+  'from': 'x-to'
 }
 
 admin.initializeApp({
@@ -40,8 +40,10 @@ mailListener.on('error', (err) => {
 
 mailListener.on('mail', (mail, seqno, attributes) => {
   console.log(mail.headers)
-  if (mail.attachments) {
-    uploadFile(mail, mail.attachments[0], mail.from, mail.subject, mail.html)
+  if (mail.attachments && settings.service.senderOptions[mail.from[0].address]) {
+    uploadFile(mail, mail.attachments[0], mail.from, mail.subject, mail.html, settings.service.senderOptions[mail.from[0].address]['show-on-gallery'], settings.service.senderOptions[mail.from[0].address]['show-on-wall'])
+  } else {
+    uploadFile(mail, mail.attachments[0], mail.from, mail.subject, mail.html, true, false)
   }
   console.log('emailParsed', mail.attachments)
   console.log('emailParsed', mail.from)
@@ -52,7 +54,7 @@ mailListener.on('attachment', function (attachment) {
   console.log(attachment.path)
 })
 
-let uploadFile = (mail, file, from, subject, html) => {
+let uploadFile = (mail, file, from, subject, html, showOnGallery, showOnWall) => {
   // auto-orient an image
   gm(file.path)
   .autoOrient()
@@ -75,7 +77,9 @@ let uploadFile = (mail, file, from, subject, html) => {
       file: fs.createReadStream(file.path),
       token: eventbuckettoken,
       bucket: eventbucket,
-      mailto: fromMail
+      mailto: fromMail,
+      showOnGallery: showOnGallery ? 'yes' : 'no',
+      showOnWall: showOnWall ? 'yes' : 'no'
     }
 
     request.post({url: settings.service.socialiteAPI.URL, formData: formData}, function optionalCallback (err, httpResponse, body) {
